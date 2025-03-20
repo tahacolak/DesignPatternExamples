@@ -1,0 +1,174 @@
+/**
+ * @author: tahacolak
+
+ * Creational Patterns: Singleton Factory, Factory
+ * Structural: Composite, Facade, Adapter
+ * Behavioral: Command
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+
+interface UIToolKitProduct {
+    void render();
+}
+
+class WindowsButton implements UIToolKitProduct {
+    public void render() {
+        System.out.println("WindowsButton rendered with 200x100 size.");
+    }
+}
+class MacButton implements UIToolKitProduct {
+    public void render() {
+        System.out.println("MacButton rendered with 220x110 size.");
+    }
+}
+
+class LinuxButton implements UIToolKitProduct {
+    public void render() {
+        System.out.println("LinuxButton rendered with 210x105 size.");
+    }
+}
+
+class WindowsScrollBar implements UIToolKitProduct {
+    public void render() {
+        System.out.println("WindowsScrollBar rendered with 420x180 size.");
+    }
+}
+
+class MacScrollBar implements UIToolKitProduct {
+    public void render() {
+        System.out.println("MacScrollBar rendered with 400x170 size.");
+    }
+}
+
+class LinuxScrollBar implements UIToolKitProduct {
+    public void render() {
+        System.out.println("LinuxScrollBar rendered with 410x175 size.");
+    }
+}
+
+class WindowsDropdownMenu implements UIToolKitProduct {
+    public void render() {
+        System.out.println("WindowsDropdownMenu rendered with 300x150 size.");
+    }
+}
+
+class MacDropdownMenu implements UIToolKitProduct {
+    public void render() {
+        System.out.println("MacDropdownMenu rendered with 310x155 size.");
+    }
+}
+
+class LinuxDropdownMenu implements UIToolKitProduct {
+    public void render() {
+        System.out.println("LinuxDropdownMenu rendered with 320x160 size.");
+    }
+}
+
+enum ProductType {
+    BUTTON, SCROLLBAR, DROPDOWNMENU
+}
+
+abstract class UIToolKitFactory {
+    public abstract UIToolKitProduct createProduct(ProductType type);
+}
+
+class WindowsFactory extends UIToolKitFactory {
+    private static WindowsFactory instance;
+
+    private WindowsFactory() {}
+
+    public static synchronized WindowsFactory getInstance() {
+        if (instance == null) {
+            instance = new WindowsFactory();
+        }
+        return instance;
+    }
+
+    public UIToolKitProduct createProduct(ProductType type) {
+        return switch (type) {
+            case BUTTON -> new WindowsButton();
+            case SCROLLBAR -> new WindowsScrollBar();
+            case DROPDOWNMENU -> new WindowsDropdownMenu();
+        };
+    }
+}
+
+class MacFactory extends UIToolKitFactory {
+    private static MacFactory instance;
+
+    private MacFactory() {}
+
+    public static synchronized MacFactory getInstance() {
+        if (instance == null) {
+            instance = new MacFactory();
+        }
+        return instance;
+    }
+
+    public UIToolKitProduct createProduct(ProductType type) {
+        return switch (type) {
+            case BUTTON -> new MacButton();
+            case SCROLLBAR -> new MacScrollBar();
+            case DROPDOWNMENU -> new MacDropdownMenu();
+        };
+    }
+}
+
+class LinuxFactory extends UIToolKitFactory {
+    private static LinuxFactory instance;
+
+    private LinuxFactory() {}
+
+    public static synchronized LinuxFactory getInstance() {
+        if (instance == null) {
+            instance = new LinuxFactory();
+        }
+        return instance;
+    }
+
+    public UIToolKitProduct createProduct(ProductType type) {
+        return switch (type) {
+            case BUTTON -> new LinuxButton();
+            case SCROLLBAR -> new LinuxScrollBar();
+            case DROPDOWNMENU -> new LinuxDropdownMenu();
+        };
+    }
+}
+
+
+
+class DesktopApplication {
+    private final List<UIToolKitProduct> products = new ArrayList<>();
+
+    public void createDesktopApplication(UIToolKitFactory factory) {
+        products.add(factory.createProduct(ProductType.BUTTON));
+        products.add(factory.createProduct(ProductType.SCROLLBAR));
+        products.add(factory.createProduct(ProductType.DROPDOWNMENU));
+    }
+
+    public void display() {
+        for (UIToolKitProduct product : products) {
+            product.render();
+        }
+    }
+}
+
+public class AbstractFactoryDemo {
+    public static void main(String[] args) {
+        DesktopApplication app = new DesktopApplication();
+
+        System.out.println("\nCreating Windows UI:");
+        app.createDesktopApplication(WindowsFactory.getInstance());
+        app.display();
+
+        System.out.println("\nCreating Mac UI:");
+        app.createDesktopApplication(MacFactory.getInstance());
+        app.display();
+
+        System.out.println("\nCreating Linux UI");
+        app.createDesktopApplication(LinuxFactory.getInstance());
+        app.display();
+    }
+}
