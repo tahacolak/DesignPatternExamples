@@ -1,0 +1,129 @@
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+class Participant {
+    int ssNo;
+    String name;
+    int age;
+
+    public Participant(int ssNo, String name, int age) {
+        this.ssNo = ssNo;
+        this.name = name;
+        this.age = age;
+    }
+
+    public int getSsNo() {
+        return ssNo;
+    }
+
+    public void setSsNo(int ssNo) {
+        this.ssNo = ssNo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void removeParticipant() {
+    }
+}
+
+interface EmotionLogger {
+    String[] emotions = {"Calm", "Neutral", "Stressed"};
+    void logEmotion();
+}
+
+class ManualEmotionLogger implements EmotionLogger {
+    public void logEmotion() {
+        System.out.println("Manually logged emotion: " + emotions[new Random().nextInt(emotions.length)]);
+    }
+}
+
+class ExperimentSystem {
+    List<Participant> participants = new ArrayList<Participant>();
+    List<EmotionLogger> loggers = new ArrayList<EmotionLogger>();
+
+    public void addParticipant(Participant p) {
+        participants.add(p);
+    }
+
+    public void removeParticipant(Participant p) {
+        participants.remove(p);
+    }
+
+    public void executeExperiment() {
+        Random rand = new Random();
+        for (Participant p : participants) {
+            loggers.get(rand.nextInt(loggers.size())).logEmotion();
+        }
+    }
+}
+
+
+class HeadBandTracker {
+    public void captureEEGAndLogEmotion(int signal) {
+        String emotion;
+        if (signal < 30) emotion = "Calm";
+        else if (signal < 60) emotion = "Neutral";
+        else emotion = "Stressed";
+
+        System.out.println("HeadBand detected emotion: " + emotion);
+    }
+}
+class HeadBandAdapter implements EmotionLogger {
+    private final HeadBandTracker tracker = new HeadBandTracker();
+
+    public void logEmotion() {
+        int signal = new Random().nextInt(101);
+        tracker.captureEEGAndLogEmotion(signal);
+    }
+}
+class HeadBandAdapterInherited extends HeadBandTracker implements EmotionLogger {
+    public void logEmotion() {
+        int signal = new Random().nextInt(101);
+        captureEEGAndLogEmotion(signal);
+    }
+}
+
+
+
+
+public class Main {
+    public static void main(String[] args) {
+        ExperimentSystem system = new ExperimentSystem();
+        Participant p1=new Participant(1, "Taha", 23);
+
+        System.out.println( p1.getSsNo()+"\t"+p1.getName().toUpperCase()+"\t"+p1.getAge());
+
+        system.addParticipant(new Participant(2,"Elif",22));
+        system.addParticipant(new Participant(3,"Tarık",16));
+        system.addParticipant(new Participant(4,"Berk",34));
+
+
+        system.loggers.add(new ManualEmotionLogger());
+        system.loggers.add(new HeadBandAdapter()); // Composition
+        system.loggers.add(new HeadBandAdapterInherited()); //with inheritance
+        system.executeExperiment();
+
+        //remove participant
+        System.out.println("After removing...");
+        p1.removeParticipant();
+
+
+        System.out.println();
+    }
+}
